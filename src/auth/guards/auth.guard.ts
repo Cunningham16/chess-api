@@ -6,6 +6,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+export interface HeadersWithAuth extends Headers {
+  authorization: string | undefined;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
@@ -30,7 +34,8 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    const headers: HeadersWithAuth = request.headers as HeadersWithAuth;
+    const [type, token] = headers.authorization.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

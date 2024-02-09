@@ -3,7 +3,7 @@ import { Game } from 'src/game/entities/game.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 

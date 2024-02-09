@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Game } from './game.entity';
+import { Transform } from 'class-transformer';
 
 @Entity()
 export class Move {
@@ -7,14 +8,12 @@ export class Move {
   id: number;
 
   @Column()
-  notation: string;
+  from: string;
 
   @Column()
-  withPositions: {
-    from: string;
-    to: string;
-  };
+  to: string;
 
   @ManyToOne(() => Game, (game) => game.moves)
+  @Transform(({ value }) => value.id)
   game: Game;
 }

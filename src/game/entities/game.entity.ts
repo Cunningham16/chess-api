@@ -1,4 +1,4 @@
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Move } from './move.entity';
 import { GAMESTATUS } from 'src/common/enums/game_status.enum';
+import { Transform } from 'class-transformer';
 
 @Entity()
 export class Game {
@@ -25,13 +26,21 @@ export class Game {
   @OneToMany(() => Move, (move) => move.game)
   moves: Move[];
 
-  @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: 'player_white_id' })
-  player_white: User;
+  @ManyToOne(() => UserEntity, { eager: true })
+  @JoinColumn({ name: 'player_white' })
+  @Transform(({ value }) => ({
+    id: value.id,
+    nickname: value.nickname,
+  }))
+  player_white: UserEntity;
 
-  @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: 'player_black_id' })
-  player_black: User;
+  @ManyToOne(() => UserEntity, { eager: true })
+  @JoinColumn({ name: 'player_black' })
+  @Transform(({ value }) => ({
+    id: value.id,
+    nickname: value.nickname,
+  }))
+  player_black: UserEntity;
 
   @CreateDateColumn()
   createdAt: Date;

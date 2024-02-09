@@ -2,7 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ROLES } from 'src/common/enums/roles.enum';
 import { UsersService } from 'src/users/service/users.service';
-import bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class RegisterService {
@@ -16,7 +17,7 @@ export class RegisterService {
     email: string,
     pass: string,
     role: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ user: UserEntity; access_token: string }> {
     const foundUserByNickname =
       await this.usersService.findOneByNickname(nickname);
     if (foundUserByNickname) {
@@ -30,7 +31,7 @@ export class RegisterService {
       throw new UnauthorizedException();
     }
 
-    const hashPassword = await bcrypt.hash(pass, 10);
+    const hashPassword = await hash(pass, 10);
     const newUser = await this.usersService.createUser(
       nickname,
       email,
@@ -46,9 +47,12 @@ export class RegisterService {
       password: newUser.password,
     };
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, {
+      privateKey: process.env.JWT_SECRET_KEY,
+    });
 
     return {
+      user: newUser,
       access_token: token,
     };
   }
